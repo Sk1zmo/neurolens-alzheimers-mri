@@ -1,9 +1,27 @@
 # NeuroLens
 
+**Live: [neurolens-opal.vercel.app](https://neurolens-opal.vercel.app)**
+
 Four-stage Alzheimer's classification from a brain MRI slice, with a class
 activation map, calibrated confidence, an anonymous scan history, and a
 human-in-the-loop retraining pipeline. Deployed as a single Vercel project:
 Next.js frontend plus a Python function serving an ONNX model.
+
+Held-out test performance (1,280 original MRI slices, leak-filtered split):
+
+| Metric | Value |
+| --- | --- |
+| Accuracy | 0.9984 |
+| Balanced accuracy | 0.9989 |
+| Macro F1 | 0.9991 |
+| Macro AUC (OvR) | 1.0000 |
+| Cohen's kappa | 0.9974 |
+| ECE (raw → calibrated) | 0.0503 → 0.0011 |
+| Median inference latency | 11 ms CPU |
+
+Read [the caveat below](#what-makes-this-different-from-the-usual-notebook)
+before quoting those numbers — this dataset has no subject identifiers, so they
+overstate performance on a genuinely new patient.
 
 > **Not a medical device.** Research and teaching use only. It has no regulatory
 > clearance, has never been validated clinically, and must not inform a medical

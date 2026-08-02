@@ -2,7 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "api/predict.py": {
-      "memory": 1769,
       "maxDuration": 60,
       "excludeFiles": "{node_modules/**,.next/**,src/**,public/**,supabase/**,**/*.test.py}"
     }

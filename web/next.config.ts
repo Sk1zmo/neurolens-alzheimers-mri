@@ -2,11 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // The ONNX model and its Python function live in /api and are built by the
-  // Vercel Python runtime, not by Next.js. Keep them out of the Next build.
-  outputFileTracingExcludes: {
-    "*": ["./api/**/*"],
-  },
+  // Note: do NOT add outputFileTracingExcludes for "./api/**/*" here. The glob
+  // also matches node_modules/next/dist/compiled/@opentelemetry/api, which
+  // strips it from the server bundle and makes every route handler crash with
+  // "Cannot find module '.../@opentelemetry/api'". It is unnecessary regardless
+  // — nothing in the Next build imports the Python function, so tracing never
+  // pulls in /api or the ONNX model.
   async headers() {
     return [
       {
