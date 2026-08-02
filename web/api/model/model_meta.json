@@ -1,0 +1,49 @@
+{
+  "model_name": "alzheimer_effnetb0",
+  "version": "1.0.0",
+  "classes": [
+    "Non Demented",
+    "Very Mild Demented",
+    "Mild Demented",
+    "Moderate Demented"
+  ],
+  "class_dirs": [
+    "NonDemented",
+    "VeryMildDemented",
+    "MildDemented",
+    "ModerateDemented"
+  ],
+  "img_size": 224,
+  "mean": [
+    0.485,
+    0.456,
+    0.406
+  ],
+  "std": [
+    0.229,
+    0.224,
+    0.225
+  ],
+  "temperature": 0.4258826971054077,
+  "trained_epoch": 17,
+  "val": {
+    "loss": 0.2562462250391642,
+    "acc": 0.9989583333333333,
+    "macro_f1": 0.9993678407578473
+  },
+  "test_headline": {
+    "accuracy": 0.9984375,
+    "balanced_accuracy": 0.9988839285714286,
+    "macro_f1": 0.9990507002830449,
+    "weighted_f1": 0.9984369710358884,
+    "cohen_kappa": 0.997428433092048,
+    "macro_auc_ovr": 0.999994875729739,
+    "brier_score": 0.002835191679597715,
+    "mse": 0.0007087979198994285,
+    "ece_calibrated": 0.0010863187257200877,
+    "ece_uncalibrated": 0.05034589511342347,
+    "energy_mean": -3.323195695877075,
+    "energy_p95": -3.0820395946502686,
+    "energy_p99": -2.8927688598632812
+  }
+}

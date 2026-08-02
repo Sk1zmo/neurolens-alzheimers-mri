@@ -1,0 +1,14 @@
+# Install PyTorch first, matched to your CUDA runtime:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+# (CPU-only: drop the --index-url flag.)
+
+numpy>=1.26,<3
+pillow>=10.0
+scikit-learn>=1.4
+matplotlib>=3.8
+onnx>=1.16
+onnxruntime>=1.18
+requests>=2.31
+python-dotenv>=1.0
+tqdm>=4.66
+psutil>=5.9

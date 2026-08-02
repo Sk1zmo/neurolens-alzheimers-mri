@@ -1,0 +1,25 @@
+{
+  "note": "Held-out test-split images, never seen in training.",
+  "samples": [
+    {
+      "class": "NonDemented",
+      "file": "non-demented.jpg",
+      "source": "nonDem1954.jpg"
+    },
+    {
+      "class": "VeryMildDemented",
+      "file": "very-mild-demented.jpg",
+      "source": "verymildDem1718.jpg"
+    },
+    {
+      "class": "MildDemented",
+      "file": "mild-demented.jpg",
+      "source": "mildDem353.jpg"
+    },
+    {
+      "class": "ModerateDemented",
+      "file": "moderate-demented.jpg",
+      "source": "moderateDem32.jpg"
+    }
+  ]
+}

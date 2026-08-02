@@ -1,0 +1,33 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Training artifacts — regenerate with the training/ pipeline.
+# The deployable outputs are committed separately:
+#   web/api/model/model.onnx, web/api/model/model_meta.json
+#   web/public/model/metrics.json + plots
+artifacts/
+
+# Node / Next
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Vercel
+.vercel
+
+# Secrets
+.env
+.env.local
+.env*.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
