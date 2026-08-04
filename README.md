@@ -29,13 +29,20 @@ overstate performance on a genuinely new patient.
 
 ```text
 alzheimer-app/
-├── training/        PyTorch: split, train, evaluate, export, retrain
-├── artifacts/       splits, checkpoints, metrics, plots  (git-ignored)
+├── training/        split, train, evaluate, export, retrain, paper artifacts
+├── artifacts/       splits, checkpoints, metrics, figures  (git-ignored)
 └── web/             Next.js app + Vercel Python inference function
-    ├── api/         predict.py, _inference.py, model/model.onnx
+    ├── api/         predict.py, _inference.py, _anatomy.py, _findings.py
     ├── src/         app router pages, components, lib
+    ├── public/      model metrics, paper figures and tables
     └── supabase/    schema.sql
 ```
+
+Two analysis stages run on every scan. The **classifier** answers *which stage*.
+The **anatomy stage** answers *where the model looked* and *what is measurably
+abnormal*, in named anatomy — and both halves are computed from pixels. Nothing
+in the report is generated text: a fluent explanation that was never measured is
+the artefact an imaging paper cannot survive.
 
 ---
 
@@ -75,9 +82,88 @@ this app puts a percentage in front of a user. `evaluate.py` fits a temperature
 on the validation split; the deployed model applies it at inference.
 
 **Serving fits in a serverless function.** PyTorch alone blows past Vercel's
-bundle limit. ONNX Runtime + NumPy + Pillow lands around 40 MB, and the CAM
-colormap and bilinear upsample are written in NumPy rather than pulling in
-60 MB of OpenCV for two calls.
+bundle limit. ONNX Runtime + NumPy + Pillow + SciPy lands well inside it, and
+the CAM colormap and bilinear upsample are written in NumPy rather than pulling
+in 60 MB of OpenCV for two calls.
+
+**Morphometry corroborates the labels.** Seven indices are measured by
+segmentation with no involvement of the classifier — and every one separates
+the four stages (one-way ANOVA, p from 6e-5 to 3e-91, η² to 0.237, |ρ| to 0.45
+against ordinal severity), each in the direction the pathophysiology predicts.
+That is independent evidence the labels track real anatomy rather than a
+dataset artefact.
+
+---
+
+## The anatomy stage
+
+`web/api/_anatomy.py` (shared by training and serving):
+
+1. **Intracranial mask** — threshold, largest component, morphological closing,
+   hole filling. The closing matters: widened sulci stay connected to the
+   background, so measuring CSF against a *tissue* mask excludes the very
+   atrophy signal you are after and makes CSF fraction *fall* as disease
+   worsens.
+2. **Registration** — similarity transform (translation, rotation, isotropic
+   scale) recovered from the mask's centroid and principal axes.
+3. **Tissue split** — recursive Otsu on intracranial pixels. T1 orders
+   CSF < grey < white, and the dominant contrast is white-vs-rest, so the
+   first threshold separates `CSF+grey` from `white` and the second must split
+   the *dark* side. Splitting the bright side instead pools grey matter with
+   CSF and pushes CSF fraction to ~40%.
+4. **Atlas** — coarse parametric lobar territories in template space; ventricles
+   and CSF are segmented per scan. Region names denote approximate territories,
+   not a FreeSurfer-grade parcellation, and the reports say so.
+5. **Attribution** — the CAM is warped to template space and integrated per
+   region, reported as both share and density so a large region cannot win on
+   area alone.
+
+`web/api/_findings.py` turns those numbers into findings. Each rule fires on a
+measured z-score or attention density and carries a measurement, an
+interpretation, the mechanism, and citations — 14 references including Braak
+1991, Scheltens 1992, Frisoni 2010, Jack 2018, Nestor 2008, Wardlaw 2013, and
+Arun 2021 on the trustworthiness of saliency maps.
+
+**Not a plane classifier.** The corpus is axial-only, so `axial_view_check`
+*verifies* consistency with an axial slice and estimates its level. Coronal and
+sagittal discrimination would need a multi-plane training set; that is stated as
+a limitation rather than faked.
+
+Always look at the masks, never just the numbers — area-based morphometry fails
+silently:
+
+```bash
+python training/qc_anatomy.py     # renders one QC panel per stage
+```
+
+---
+
+## Research artifacts
+
+```bash
+python training/make_paper.py            # statistics + figures + publish
+python training/make_paper.py --full     # also rebuild the anatomy norms
+python training/make_paper.py --deploy   # ...then ship it
+```
+
+Produces, into `artifacts/paper/` and `web/public/paper/`:
+
+| Artifact | Contents |
+| --- | --- |
+| 10 figures | 300 dpi PNG + vector PDF |
+| `qc_segmentation.png` | per-stage segmentation QC |
+| `statistics.json` | every number, with intervals |
+| `tables/*.csv`, `*.tex` | ready to paste |
+| `morphometry.csv` | per-image raw measurements |
+| `test_predictions.npz` | raw probabilities, energies, attention |
+
+`paper_stats.py` scores the test set through the **deployed ONNX path**, not the
+PyTorch checkpoint, so the paper's numbers are the endpoint's numbers. It
+computes percentile bootstrap CIs, Wilson intervals for small-n recall
+(ModerateDemented has n=13), one-way ANOVA with η², Spearman ρ against ordinal
+severity, Cliff's delta, and an adjacent-stage error breakdown.
+
+Everything is browsable at `/research` on the deployed site.
 
 ---
 
