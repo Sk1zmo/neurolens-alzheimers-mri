@@ -62,7 +62,10 @@ const FIGURES = [
       "Two-stage schedule: the linear head is warmed up against a frozen backbone before the " +
       "whole network is fine-tuned with discriminative learning rates under a one-cycle " +
       "schedule. Selection is on validation macro-F1, not accuracy, because ModerateDemented " +
-      "is about 1% of the original data.",
+      "is about 1% of the original data. Read panel (c) as a warning rather than a result: " +
+      "validation macro-F1 saturates at exactly 1.000 by epoch 16 and stays there. A held-out " +
+      "set that is solved perfectly is not measuring generalisation — it is the subject-level " +
+      "leakage of this dataset showing up in the training dynamics.",
   },
   {
     file: "fig03_confusion.png",
