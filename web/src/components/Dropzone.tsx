@@ -2,15 +2,26 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const ACCEPT = ["image/jpeg", "image/png", "image/webp", "image/bmp"];
-const MAX_BYTES = 12 * 1024 * 1024;
+const IMAGE_MIME = ["image/jpeg", "image/png", "image/webp", "image/bmp"];
+// Browsers report DICOM and NIfTI inconsistently — often as an empty string or
+// application/octet-stream — so extension is the only reliable signal, and the
+// server sniffs the magic bytes regardless.
+const MEDICAL_EXT = [".dcm", ".dicom", ".ima", ".nii", ".nii.gz", ".zip"];
+const ACCEPT_ATTR = [...IMAGE_MIME, ...MEDICAL_EXT].join(",");
+const MAX_BYTES = 60 * 1024 * 1024;
+
+function hasMedicalExtension(name: string): boolean {
+  const lower = name.toLowerCase();
+  return MEDICAL_EXT.some((ext) => lower.endsWith(ext));
+}
 
 export function validateImage(file: File): string | null {
-  if (!ACCEPT.includes(file.type)) {
-    return `${file.type || "That file type"} isn't supported. Use JPEG, PNG, WebP or BMP.`;
+  const ok = IMAGE_MIME.includes(file.type) || hasMedicalExtension(file.name);
+  if (!ok) {
+    return `${file.type || "That file type"} isn't supported. Use JPEG, PNG, WebP, BMP, DICOM (.dcm), a zipped DICOM series, or NIfTI (.nii/.nii.gz).`;
   }
   if (file.size > MAX_BYTES) {
-    return `That image is ${(file.size / 1024 / 1024).toFixed(1)} MB — the limit is 12 MB.`;
+    return `That file is ${(file.size / 1024 / 1024).toFixed(1)} MB — the limit is 60 MB.`;
   }
   return null;
 }
@@ -75,7 +86,7 @@ export default function Dropzone({
         <input
           ref={inputRef}
           type="file"
-          accept={ACCEPT.join(",")}
+          accept={ACCEPT_ATTR}
           className="sr-only"
           disabled={disabled}
           onChange={(e) => {
@@ -106,7 +117,7 @@ export default function Dropzone({
           </svg>
         </div>
 
-        <p className="text-sm font-medium">Drop an MRI slice here</p>
+        <p className="text-sm font-medium">Drop a scan here</p>
         <p className="mt-1 text-[0.8125rem] text-[var(--text-secondary)]">
           or{" "}
           <button
@@ -119,8 +130,13 @@ export default function Dropzone({
           </button>{" "}
           — you can paste too
         </p>
-        <p className="mt-3 text-[0.75rem] text-[var(--text-muted)]">
-          JPEG, PNG, WebP or BMP · up to 12 MB · axial T1 brain slice
+        <p className="mt-3 text-[0.75rem] leading-relaxed text-[var(--text-muted)]">
+          Image (JPEG/PNG/WebP/BMP), DICOM (.dcm), a zipped DICOM series, or
+          NIfTI (.nii/.nii.gz) · up to 60 MB
+        </p>
+        <p className="mt-1 text-[0.75rem] leading-relaxed text-[var(--text-muted)]">
+          Give it a volume and the axial slice matching the training level is
+          selected automatically.
         </p>
       </div>
 

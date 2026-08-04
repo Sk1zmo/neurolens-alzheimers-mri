@@ -36,8 +36,11 @@ from dataset import ScanDataset, class_weights, eval_transform, load_split, trai
 from model import AlzheimerNet
 
 
-def build_loaders(balanced_sampler: bool = True):
-    train_recs = load_split("train")
+def build_loaders(balanced_sampler: bool = True, suffix: str = ""):
+    # The suffix lets the ablation runner swap the training manifest without
+    # touching the deployed split. val/test are never suffixed: every variant
+    # must be scored on the identical held-out data or the comparison is void.
+    train_recs = load_split(f"train{suffix}")
     val_recs = load_split("val")
 
     train_ds = ScanDataset(train_recs, transform=train_transform())
@@ -133,6 +136,10 @@ def main() -> None:
     ap.add_argument("--resume-from", type=str, default=None,
                     help="Checkpoint to warm-start from (used by retrain.py).")
     ap.add_argument("--out", type=str, default="best.pt")
+    ap.add_argument("--split-suffix", type=str, default="",
+                    help="Load train<suffix>.json instead of train.json.")
+    ap.add_argument("--no-balance", action="store_true",
+                    help="Disable the balanced sampler and class weights.")
     args = ap.parse_args()
 
     C.BATCH_SIZE = args.batch_size
@@ -146,8 +153,10 @@ def main() -> None:
     amp = C.AMP and device.type == "cuda"
     print(f"Device: {device} | AMP: {amp}")
 
-    train_ds, val_ds, train_loader, val_loader = build_loaders()
-    print(f"train {len(train_ds)} | val {len(val_ds)}")
+    train_ds, val_ds, train_loader, val_loader = build_loaders(
+        balanced_sampler=not args.no_balance, suffix=args.split_suffix)
+    print(f"train {len(train_ds)} | val {len(val_ds)}"
+          f"{' | balancing OFF' if args.no_balance else ''}")
     print("train class counts:",
           np.bincount(np.array(train_ds.labels), minlength=C.NUM_CLASSES).tolist())
 
@@ -158,9 +167,14 @@ def main() -> None:
         print(f"warm-started from {args.resume_from}")
     model = model.to(memory_format=torch.channels_last)
 
-    weights = class_weights(train_ds.labels, C.NUM_CLASSES).to(device)
-    print("class weights:", [round(w, 3) for w in weights.tolist()])
-    criterion = nn.CrossEntropyLoss(weight=weights, label_smoothing=C.LABEL_SMOOTHING)
+    if args.no_balance:
+        weights = None
+        print("class weights: uniform (ablation)")
+    else:
+        weights = class_weights(train_ds.labels, C.NUM_CLASSES).to(device)
+        print("class weights:", [round(w, 3) for w in weights.tolist()])
+    criterion = nn.CrossEntropyLoss(weight=weights,
+                                    label_smoothing=C.LABEL_SMOOTHING)
 
     scaler = torch.amp.GradScaler("cuda", enabled=amp)
     history: list[dict] = []

@@ -126,6 +126,52 @@ const FIGURES = [
       "ventricle-to-brain ratio and most densely weighted region.",
   },
   {
+    file: "fig11_uncertainty.png",
+    title: "Selective prediction",
+    caption:
+      "Accuracy on the cases the system answers, as the least certain are deferred to a " +
+      "clinician. On the clean split this is degenerate — the model makes too few errors " +
+      "to rank, and that is reported rather than hidden. Under noise the mechanism works, " +
+      "and the free-energy score is the best deferral signal.",
+  },
+  {
+    file: "fig12_saliency.png",
+    title: "Are the activation maps faithful?",
+    caption:
+      "Insertion passes decisively: revealing CAM-ranked pixels restores the prediction far " +
+      "faster than revealing random ones. Deletion fails, and the likely reason is " +
+      "structural — the CAM concentrates on the ventricles, which are homogeneous, so " +
+      "blurring them removes little information however important they are. Reported as a " +
+      "split verdict rather than resolved in the method's favour.",
+  },
+  {
+    file: "fig13_robustness.png",
+    title: "Robustness to acquisition variation",
+    caption:
+      "The model tolerates rotation and contrast shifts but degrades sharply under noise " +
+      "and blur — accuracy falls below 40% at σ = 0.25 and below 20% at a 5 px blur. Any " +
+      "deployment across scanners or protocols has to account for that.",
+  },
+  {
+    file: "fig14_ablation.png",
+    title: "Ablation",
+    caption:
+      "All variants share one shortened schedule and one held-out test split; only the " +
+      "training manifest or the sampler changes. The gap between the shipped configuration " +
+      "and the no-leak-filter row is the accuracy inflation the standard protocol for this " +
+      "dataset buys for free.",
+  },
+  {
+    file: "fig11_subject_recovery.png",
+    title: "Subject recovery — a negative result",
+    caption:
+      "The class counts are exactly 100/70/28/2 subjects × 32 slices, matching the OASIS-1 " +
+      "CDR breakdown, which suggested the export might be contiguous per-subject blocks. It " +
+      "is not: within-block and across-boundary similarity are identical, and the " +
+      "best-fitting block length differs per class. Subject identity is genuinely " +
+      "destroyed, so subject-level splitting requires the original OASIS-1 download.",
+  },
+  {
     file: "qc_segmentation.png",
     title: "Segmentation quality control",
     caption:
@@ -135,6 +181,37 @@ const FIGURES = [
       "so this panel is checked whenever the segmentation changes.",
   },
 ];
+
+interface Experiments {
+  throughput?: {
+    classification_only: { median_ms: number; throughput_per_min: number };
+    full_pipeline: { median_ms: number; throughput_per_min: number };
+    cost_model: { usd_per_1000_scans: number; assumption: string };
+    hardware: string;
+  };
+  saliency?: {
+    auc_deletion_cam: number;
+    auc_deletion_random: number;
+    auc_insertion_cam: number;
+    auc_insertion_random: number;
+    deletion_passes: boolean;
+    insertion_passes: boolean;
+    interpretation: string;
+  };
+  uncertainty?: Record<
+    string,
+    { base_accuracy: number; n_errors: number; degenerate: boolean }
+  >;
+}
+
+async function readExperiments(): Promise<Experiments | null> {
+  try {
+    const file = path.join(process.cwd(), "public", "paper", "experiments.json");
+    return JSON.parse(await fs.readFile(file, "utf-8")) as Experiments;
+  } catch {
+    return null;
+  }
+}
 
 async function readStats(): Promise<Stats | null> {
   try {
@@ -167,6 +244,7 @@ function fmtP(p: number): string {
 
 export default async function ResearchPage() {
   const stats = await readStats();
+  const exp = await readExperiments();
   const present = await Promise.all(
     FIGURES.map(async (f) => ({ ...f, ok: await figureExists(f.file) })),
   );
@@ -350,6 +428,115 @@ export default async function ResearchPage() {
               </tbody>
             </table>
           </div>
+        </section>
+      )}
+
+      {/* ---- clinical utility --------------------------------------------- */}
+      {exp?.throughput && (
+        <section className="card mb-6 p-5 sm:p-6">
+          <h2 className="text-base font-semibold tracking-tight">
+            Table 4 — Measured throughput and cost
+          </h2>
+          <p className="mt-1.5 max-w-2xl text-[0.8125rem] leading-relaxed text-[var(--text-secondary)]">
+            Any claim about saving clinician time or money needs numbers behind
+            it. These are measured end-to-end through the deployed path, on CPU.
+          </p>
+          <dl className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {[
+              {
+                k: "Classify",
+                v: `${exp.throughput.classification_only.median_ms.toFixed(0)} ms`,
+                h: `${exp.throughput.classification_only.throughput_per_min.toFixed(0)}/min`,
+              },
+              {
+                k: "Full report",
+                v: `${exp.throughput.full_pipeline.median_ms.toFixed(0)} ms`,
+                h: `${exp.throughput.full_pipeline.throughput_per_min.toFixed(0)}/min`,
+              },
+              {
+                k: "Cost / 1000",
+                v: `$${exp.throughput.cost_model.usd_per_1000_scans.toFixed(4)}`,
+                h: "serverless, warm",
+              },
+              { k: "Hardware", v: "CPU", h: "no GPU required" },
+            ].map((m) => (
+              <div key={m.k}>
+                <dt className="text-[0.6875rem] uppercase tracking-wide text-[var(--text-muted)]">
+                  {m.k}
+                </dt>
+                <dd className="tnum mt-0.5 text-xl font-semibold leading-none">
+                  {m.v}
+                </dd>
+                <p className="mt-1 text-[0.6875rem] text-[var(--text-muted)]">
+                  {m.h}
+                </p>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-4 text-[0.75rem] leading-relaxed text-[var(--text-muted)]">
+            {exp.throughput.cost_model.assumption} These figures describe
+            inference cost only — they are not a claim that the system saves
+            clinician time, which requires the reader study.
+          </p>
+        </section>
+      )}
+
+      {/* ---- saliency verdict --------------------------------------------- */}
+      {exp?.saliency && (
+        <section className="card mb-6 p-5 sm:p-6">
+          <h2 className="text-base font-semibold tracking-tight">
+            Saliency faithfulness — a split verdict
+          </h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {[
+              {
+                name: "Deletion",
+                pass: exp.saliency.deletion_passes,
+                cam: exp.saliency.auc_deletion_cam,
+                rand: exp.saliency.auc_deletion_random,
+                better: "lower",
+              },
+              {
+                name: "Insertion",
+                pass: exp.saliency.insertion_passes,
+                cam: exp.saliency.auc_insertion_cam,
+                rand: exp.saliency.auc_insertion_random,
+                better: "higher",
+              },
+            ].map((t) => (
+              <div
+                key={t.name}
+                className="rounded-xl border p-4"
+                style={{
+                  borderColor: `color-mix(in srgb, ${
+                    t.pass ? "var(--good)" : "var(--serious)"
+                  } 40%, transparent)`,
+                  background: `color-mix(in srgb, ${
+                    t.pass ? "var(--good)" : "var(--serious)"
+                  } 8%, transparent)`,
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[0.875rem] font-medium">{t.name}</span>
+                  <span
+                    className="text-[0.75rem] font-medium"
+                    style={{
+                      color: t.pass ? "var(--good)" : "var(--serious)",
+                    }}
+                  >
+                    {t.pass ? "passes" : "fails"}
+                  </span>
+                </div>
+                <p className="tnum mt-2 text-[0.8125rem] text-[var(--text-secondary)]">
+                  CAM {t.cam.toFixed(3)} · random {t.rand.toFixed(3)} ({t.better}{" "}
+                  is better)
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[0.8125rem] leading-relaxed text-[var(--text-secondary)]">
+            {exp.saliency.interpretation}
+          </p>
         </section>
       )}
 

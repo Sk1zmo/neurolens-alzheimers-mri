@@ -6,6 +6,7 @@ import AnatomyReport from "@/components/AnatomyReport";
 import Dropzone from "@/components/Dropzone";
 import ProbabilityBars from "@/components/ProbabilityBars";
 import ScanViewer from "@/components/ScanViewer";
+import VolumePanel from "@/components/VolumePanel";
 import { classById } from "@/lib/classes";
 import { fileToDataUrl, loadMetrics, runPrediction } from "@/lib/predict";
 import { downloadReport } from "@/lib/pdf";
@@ -417,6 +418,9 @@ export default function Analyzer() {
                 )}
               </div>
             )}
+
+            {/* DICOM / NIfTI provenance and slice selection */}
+            <VolumePanel volume={result.volume} input={result.input_format} />
 
             {/* anatomical localisation, morphometry and findings */}
             <AnatomyReport

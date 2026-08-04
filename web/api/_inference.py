@@ -237,12 +237,57 @@ def scan_plausibility(img: Image.Image) -> dict[str, Any]:
 def predict(data: bytes, want_overlay: bool = True,
             want_anatomy: bool = True) -> dict[str, Any]:
     meta = get_meta()
-    img = load_image(data)
     session = get_session()
+
+    # Decode DICOM / DICOM series / NIfTI / plain image. For a volume this also
+    # picks the slice matching the training level and returns its neighbours.
+    try:
+        import _medical_io
+    except ImportError:  # pragma: no cover - depends on Vercel's sys.path
+        from api import _medical_io  # type: ignore
+
+    scan = _medical_io.load_scan(data)
+    img = scan.image
+    volume_info: dict[str, Any] | None = None
 
     logits, cam = session.run(None, {"input": preprocess(img)})
     logits = np.asarray(logits, dtype=np.float32)[0]
     cam = np.asarray(cam, dtype=np.float32)[0]
+
+    if scan.is_volume and scan.neighbours:
+        # Aggregate over adjacent slices. A single slice is one noisy sample of
+        # a 3-D process; averaging the probabilities over neighbouring levels
+        # is the cheapest way to stop a single unrepresentative slice from
+        # deciding the answer. The reported CAM stays on the selected slice so
+        # the overlay still lines up with what is displayed.
+        per_slice = []
+        for neighbour in scan.neighbours:
+            n_logits, _ = session.run(None, {"input": preprocess(neighbour)})
+            per_slice.append(np.asarray(n_logits, dtype=np.float32)[0])
+        stack = np.stack(per_slice)
+        temp = float(meta.get("temperature", 1.0)) or 1.0
+        slice_probs = np.exp(stack / temp - (stack / temp).max(axis=1, keepdims=True))
+        slice_probs /= slice_probs.sum(axis=1, keepdims=True)
+        mean_probs = slice_probs.mean(axis=0)
+        agreement = float((slice_probs.argmax(1) == slice_probs.argmax(1)[
+            len(slice_probs) // 2]).mean())
+
+        volume_info = {
+            "source_format": scan.source_format,
+            "n_slices": scan.n_slices,
+            "selected_index": scan.selected_index,
+            "aggregated_over": len(per_slice),
+            "slice_agreement": agreement,
+            "aggregated_probabilities": [float(p) for p in mean_probs],
+            "per_slice_probabilities": [[float(p) for p in row]
+                                        for row in slice_probs],
+            "slice_scores": scan.slice_scores,
+            "note": "Probabilities are averaged over the selected slice and its "
+                    "neighbours; the activation map shown is for the selected "
+                    "slice.",
+        }
+        # Aggregated logits drive the reported prediction.
+        logits = stack.mean(axis=0)
 
     temperature = float(meta.get("temperature", 1.0)) or 1.0
     probs = softmax(logits / temperature)
@@ -283,6 +328,15 @@ def predict(data: bytes, want_overlay: bool = True,
     return {
         "anatomy": anatomy,
         "report": report,
+        "volume": volume_info,
+        "input_format": {
+            "source": scan.source_format,
+            "modality": scan.modality,
+            "is_volume": scan.is_volume,
+            "n_slices": scan.n_slices,
+            "warnings": scan.warnings,
+            "meta": scan.meta,
+        },
         "ok": True,
         "class_id": idx,
         "label": meta["classes"][idx],

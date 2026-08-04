@@ -1,0 +1,241 @@
+{
+  "n": 58,
+  "per_class": 15,
+  "seed": 90210,
+  "source": "held-out test split",
+  "note": "Classes are equalised, not proportional: at the natural ~50% NonDemented rate a reader could score well by answering 'Non' throughout, which would make kappa uninformative.",
+  "cases": [
+    {
+      "file": "case_000_309ad9f2598fe74a.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_001_ec8c3dbf44aedbc8.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_002_0b65ee7caa60c923.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_003_7b3fb9e81871fc0c.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_004_459f00717bae2083.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_005_83e959fa253e4efc.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_006_0745091835d398fe.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_007_0cb7f854c6ae0a30.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_008_e0af37d4fd3a9bbc.jpg",
+      "truth": "ModerateDemented"
+    },
+    {
+      "file": "case_009_858f92ab533bcb85.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_010_2dbfd00498eef265.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_011_b0d66cea742c1dcc.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_012_aad3f84a482a09c4.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_013_34a79d365cde92ab.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_014_346d084768ec4a8c.jpg",
+      "truth": "ModerateDemented"
+    },
+    {
+      "file": "case_015_2e1fd63aefa0d814.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_016_2ecaa28edc983565.jpg",
+      "truth": "ModerateDemented"
+    },
+    {
+      "file": "case_017_49c23d5ef39fd3cb.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_018_f05e1ea0a9529876.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_019_a4e43cc7bc89b0ae.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_020_5657991def90a9e6.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_021_4613e606b5f6b147.jpg",
+      "truth": "ModerateDemented"
+    },
+    {
+      "file": "case_022_1d85cbfeba99480c.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_023_bd5a2e6b40b8b44c.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_024_19eb4904efae5dc4.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_025_59dde71b57a0957f.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_026_d96e85101d9dd6cc.jpg",
+      "truth": "ModerateDemented"
+    },
+    {
+      "file": "case_027_5e6a850ac6f311d2.jpg",
+      "truth": "ModerateDemented"
+    },
+    {
+      "file": "case_028_52ee4ca562a3b7f2.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_029_6e9798a8fa328518.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_030_28ee6bd780d94a71.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_031_05011de36a0a2e6b.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_032_1fe298af454886b3.jpg",
+      "truth": "ModerateDemented"
+    },
+    {
+      "file": "case_033_ca1db2d88b159988.jpg",
+      "truth": "ModerateDemented"
+    },
+    {
+      "file": "case_034_88ec610f96f200fe.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_035_9a9bb950203bcee6.jpg",
+      "truth": "ModerateDemented"
+    },
+    {
+      "file": "case_036_cce0b6c5a67c1784.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_037_894fb5c4449abb56.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_038_814a758222b9b2ed.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_039_ae76d927b6db45ed.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_040_ac287e48c94a96ff.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_041_ac221404b967997b.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_042_f28964c91186885b.jpg",
+      "truth": "ModerateDemented"
+    },
+    {
+      "file": "case_043_2fe67b99a2b5ad06.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_044_e8b749b158ffa0ac.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_045_7628b5c8cc4076d8.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_046_81ef3f1ebd4e5550.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_047_d9e0e33ea39a5129.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_048_73f1f0fa853cc2a1.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_049_0d84c42c63ac9ff4.jpg",
+      "truth": "NonDemented"
+    },
+    {
+      "file": "case_050_0e797f4d077a4383.jpg",
+      "truth": "VeryMildDemented"
+    },
+    {
+      "file": "case_051_72d1993a11b141e5.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_052_694c89a90a5ecdba.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_053_909473484498f92c.jpg",
+      "truth": "MildDemented"
+    },
+    {
+      "file": "case_054_ca2c5871cd117f68.jpg",
+      "truth": "ModerateDemented"
+    },
+    {
+      "file": "case_055_79354abddce6b8a4.jpg",
+      "truth": "ModerateDemented"
+    },
+    {
+      "file": "case_056_12960d67fea52007.jpg",
+      "truth": "ModerateDemented"
+    },
+    {
+      "file": "case_057_ed7b36fd11549a29.jpg",
+      "truth": "VeryMildDemented"
+    }
+  ]
+}

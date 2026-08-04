@@ -80,10 +80,33 @@ export interface FindingsReport {
   disclaimer: string;
 }
 
+export interface VolumeInfo {
+  source_format: string;
+  n_slices: number;
+  selected_index: number;
+  aggregated_over: number;
+  slice_agreement: number;
+  aggregated_probabilities: number[];
+  per_slice_probabilities: number[][];
+  slice_scores: number[] | null;
+  note: string;
+}
+
+export interface InputFormat {
+  source: string;
+  modality: string;
+  is_volume: boolean;
+  n_slices: number;
+  warnings: string[];
+  meta: Record<string, unknown>;
+}
+
 export interface PredictResponse {
   ok: true;
   anatomy: AnatomyResult | null;
   report: FindingsReport | null;
+  volume: VolumeInfo | null;
+  input_format: InputFormat;
   class_id: number;
   label: string;
   class_dir: string;

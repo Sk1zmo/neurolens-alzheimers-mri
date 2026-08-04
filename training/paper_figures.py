@@ -617,6 +617,166 @@ def fig10_qualitative() -> None:
     save(fig, "fig10_qualitative")
 
 
+def fig11_uncertainty() -> None:
+    exp = load("experiments.json")
+    if not exp or "uncertainty" not in exp:
+        print("  ! skipping fig11 (no uncertainty results)")
+        return
+    u = exp["uncertainty"]
+    fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.5))
+
+    for ax, (key, title) in zip(axes, [
+        ("clean", "(a) Clean test set"),
+        ("corrupted", "(b) With Gaussian noise (σ = 0.12)"),
+    ]):
+        block = u.get(key)
+        if not block:
+            continue
+        for i, (name, c) in enumerate(block["curves"].items()):
+            ax.plot(c["coverage"], c["accuracy"], color=SERIES[i % 4], lw=1.8,
+                    label=f"{name.replace('_', ' ')}  (AURC {c['aurc']:.3f})")
+        ax.axhline(block["base_accuracy"], color=MUTED, ls="--", lw=0.9)
+        ax.set_xlabel("Coverage (fraction of cases answered)")
+        ax.set_ylabel("Accuracy on answered cases")
+        ax.set_title(f"{title}\n{block['n_errors']} errors in {block['n']} cases",
+                     loc="left")
+        ax.grid(alpha=0.7); ax.set_axisbelow(True)
+        ax.legend(loc="lower left")
+        if block.get("degenerate"):
+            ax.text(0.5, 0.45, "degenerate:\ntoo few errors to rank",
+                    transform=ax.transAxes, ha="center", fontsize=8.5,
+                    color=MUTED)
+
+    fig.suptitle("Figure 11 — Selective prediction: deferring the least "
+                 "certain cases", y=1.03, fontsize=10.5, x=0.02, ha="left")
+    fig.tight_layout()
+    save(fig, "fig11_uncertainty")
+
+
+def fig12_saliency() -> None:
+    exp = load("experiments.json")
+    if not exp or "saliency" not in exp:
+        print("  ! skipping fig12 (no saliency results)")
+        return
+    s = exp["saliency"]
+    x = s["fraction_masked"]
+    fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.5))
+
+    ax = axes[0]
+    ax.plot(x, s["deletion_cam"], color=SERIES[0], lw=2, label="CAM order")
+    ax.plot(x, s["deletion_random"], color=DEEMPH, lw=2, ls="--",
+            label="random order")
+    ax.set_xlabel("Fraction of pixels blurred")
+    ax.set_ylabel("Probability of predicted class")
+    ax.set_title(f"(a) Deletion — AUC {s['auc_deletion_cam']:.3f} vs "
+                 f"{s['auc_deletion_random']:.3f}\n"
+                 f"{'passes' if s['deletion_passes'] else 'FAILS'} "
+                 f"(lower is better)", loc="left")
+    ax.legend(); ax.grid(alpha=0.7); ax.set_axisbelow(True)
+
+    ax = axes[1]
+    ax.plot(x, s["insertion_cam"], color=SERIES[0], lw=2, label="CAM order")
+    ax.plot(x, s.get("insertion_random", []), color=DEEMPH, lw=2, ls="--",
+            label="random order")
+    ax.set_xlabel("Fraction of pixels revealed")
+    ax.set_ylabel("Probability of predicted class")
+    ax.set_title(f"(b) Insertion — AUC {s['auc_insertion_cam']:.3f} vs "
+                 f"{s.get('auc_insertion_random', float('nan')):.3f}\n"
+                 f"{'passes' if s.get('insertion_passes') else 'FAILS'} "
+                 f"(higher is better)", loc="left")
+    ax.legend(); ax.grid(alpha=0.7); ax.set_axisbelow(True)
+
+    fig.suptitle("Figure 12 — Are the activation maps faithful?", y=1.04,
+                 fontsize=10.5, x=0.02, ha="left")
+    fig.tight_layout()
+    save(fig, "fig12_saliency")
+
+
+def fig13_robustness() -> None:
+    exp = load("experiments.json")
+    if not exp or "robustness" not in exp:
+        print("  ! skipping fig13 (no robustness results)")
+        return
+    sweeps = exp["robustness"]["sweeps"]
+    labels = {
+        "rotation_deg": "Rotation (degrees)",
+        "gaussian_noise_sigma": "Gaussian noise (σ)",
+        "contrast_factor": "Contrast factor",
+        "blur_radius_px": "Gaussian blur (px)",
+        "downsample_factor": "Downsample factor",
+    }
+    keys = [k for k in labels if k in sweeps]
+    fig, axes = plt.subplots(1, len(keys), figsize=(2.05 * len(keys), 2.9),
+                             sharey=True)
+    if len(keys) == 1:
+        axes = [axes]
+
+    for ax, key in zip(axes, keys):
+        s = sweeps[key]
+        xs = s["levels"]
+        ys = s["accuracy"]
+        order = np.argsort(xs)
+        xs = np.array(xs)[order]; ys = np.array(ys)[order]
+        fragile = ys.min() < 0.8
+        ax.plot(xs, ys, color=SERIES[1] if fragile else ACCENT, lw=2,
+                marker="o", ms=3.5)
+        ax.set_xlabel(labels[key], fontsize=7.5)
+        ax.set_ylim(0, 1.04)
+        ax.grid(alpha=0.7); ax.set_axisbelow(True)
+        ax.axhline(0.8, color=MUTED, ls=":", lw=0.8)
+    axes[0].set_ylabel("Test accuracy")
+
+    fig.suptitle("Figure 13 — Robustness to acquisition-style perturbations "
+                 "(dotted line = 80%)", y=1.06, fontsize=10.5, x=0.02,
+                 ha="left")
+    fig.tight_layout()
+    save(fig, "fig13_robustness")
+
+
+def fig14_ablation() -> None:
+    abl = load("ablation.json")
+    if not abl or not abl.get("variants"):
+        print("  ! skipping fig14 (no ablation results yet)")
+        return
+    variants = abl["variants"]
+    names = list(variants)
+    acc = [variants[n]["headline"]["accuracy"] for n in names]
+    f1 = [variants[n]["headline"]["macro_f1"] for n in names]
+    labels = [variants[n]["label"] for n in names]
+
+    fig, ax = plt.subplots(figsize=(7.6, 3.4))
+    ys = np.arange(len(names))
+    # Emphasis form: the shipped configuration and the leaky protocol are the
+    # comparison the figure exists to make; the rest is context in grey.
+    def colour_for(variant: str) -> str:
+        if variant == "full":
+            return "#2a78d6"
+        if variant == "no_leak_filter":
+            return "#e34948"
+        return "#c3c2b7"
+
+    colours = [colour_for(n) for n in names]
+    ax.barh(ys - 0.18, acc, 0.34, color=colours, label="Accuracy")
+    ax.barh(ys + 0.18, f1, 0.34, color=colours, alpha=0.55, label="Macro F1")
+    ax.set_yticks(ys, labels, fontsize=8)
+    ax.invert_yaxis()
+    lo = min(min(acc), min(f1))
+    ax.set_xlim(max(0, lo - 0.05), 1.005)
+    ax.set_xlabel("Score on the shared held-out test split")
+    ax.grid(axis="x", alpha=0.7); ax.set_axisbelow(True)
+    for y, v in zip(ys, acc):
+        ax.text(v + 0.002, y - 0.18, f"{v:.4f}", va="center", fontsize=7)
+
+    inflation = abl.get("leak_inflation_points")
+    subtitle = ("" if inflation is None else
+                f" — skipping the leak filter inflates accuracy by "
+                f"{inflation:+.2f} points")
+    fig.suptitle(f"Figure 14 — Ablation{subtitle}", y=1.04, fontsize=10.5,
+                 x=0.02, ha="left")
+    fig.tight_layout()
+    save(fig, "fig14_ablation")
+
+
 FIGURES = {
     "fig01": fig01_dataset,
     "fig02": fig02_training,
@@ -628,6 +788,10 @@ FIGURES = {
     "fig08": fig08_perclass,
     "fig09": fig09_atlas,
     "fig10": fig10_qualitative,
+    "fig11": fig11_uncertainty,
+    "fig12": fig12_saliency,
+    "fig13": fig13_robustness,
+    "fig14": fig14_ablation,
 }
 
 
