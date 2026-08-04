@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
+import AppShell from "@/components/AppShell";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -63,13 +62,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <div className="flex min-h-dvh flex-col">
-          <SiteHeader />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <SiteFooter />
-        </div>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

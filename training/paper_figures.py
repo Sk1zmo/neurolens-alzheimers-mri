@@ -38,13 +38,16 @@ import _anatomy as A  # noqa: E402
 PAPER = C.ARTIFACTS_DIR / "paper"
 FIGS = PAPER / "figures"
 
-# Validated categorical order (see the palette validator): blue, orange, aqua,
-# yellow. Fixed assignment by class index, never cycled or reordered.
-SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]
-INK, INK2, MUTED, GRID = "#0b0b0b", "#52514e", "#898781", "#e1e0d9"
-ACCENT, DEEMPH = "#2a78d6", "#c3c2b7"
+# Atlassian-family hues, re-stepped until they pass the colour-blind and
+# chroma gates — the raw ADS chart palette does not (its teal and green read as
+# grey, and magenta/purple sit at deltaE 15). Fixed order by class index,
+# never cycled. Matches the web app's --series-* tokens on a white surface.
+SERIES = ["#0C66E4", "#E56910", "#1F845A", "#6E5DC6"]
+INK, INK2, MUTED, GRID = "#172B4D", "#44546F", "#626F86", "#EBECF0"
+ACCENT, DEEMPH = "#0C66E4", "#B3B9C4"
 SEQ = LinearSegmentedColormap.from_list(
-    "seq_blue", ["#f4f8fe", "#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"])
+    "seq_blue",
+    ["#F0F6FF", "#CFE1FD", "#9EC3F8", "#6BA2F0", "#0C66E4", "#09326C"])
 
 
 def style() -> None:

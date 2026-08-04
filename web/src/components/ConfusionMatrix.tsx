@@ -11,9 +11,9 @@ import { CLASSES } from "@/lib/classes";
  */
 const RAMP = [
   "var(--seq-100)",
-  "var(--seq-250)",
-  "var(--seq-400)",
-  "var(--seq-550)",
+  "var(--seq-200)",
+  "var(--seq-300)",
+  "var(--seq-500)",
   "var(--seq-700)",
 ];
 
