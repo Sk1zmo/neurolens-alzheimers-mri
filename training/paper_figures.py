@@ -780,6 +780,84 @@ def fig14_ablation() -> None:
     save(fig, "fig14_ablation")
 
 
+def fig15_convergence() -> None:
+    """The paper's central argument in one panel.
+
+    Four independent estimates of what this architecture can do on this task,
+    ordered by how much augmented data each was allowed to see. Two methods
+    that share no machinery — a CNN trained only on real images, and classical
+    models on segmented morphometry — land in the same place. Everything above
+    that band is bought with augmented copies of the test subjects.
+    """
+    abl = load("ablation.json")
+    ana = load("analytics.json")
+    stats = load("statistics.json")
+    if not (abl and ana and stats):
+        print("  ! skipping fig15 (needs ablation + analytics + statistics)")
+        return
+
+    same = (ana.get("baselines") or {}).get("same_split", {}).get("models", {})
+    variants = abl.get("variants", {})
+    if not same or not variants:
+        print("  ! skipping fig15 (missing paired baselines or variants)")
+        return
+
+    best_morph = max(same, key=lambda m: same[m]["macro_f1"])
+    rows = [
+        ("Morphometry only\n(7 measured indices)", same[best_morph]["macro_f1"],
+         "honest"),
+        ("CNN, original images only\n(no augmented data)",
+         variants["original_only"]["headline"]["macro_f1"], "honest"),
+        ("CNN + leak-filtered\naugmented data",
+         variants["full"]["headline"]["macro_f1"], "inflated"),
+        ("CNN + all augmented data\n(standard protocol)",
+         variants["no_leak_filter"]["headline"]["macro_f1"], "inflated"),
+        ("Reported headline\n(full schedule)",
+         stats["headline"]["macro_f1"]["value"], "inflated"),
+    ]
+
+    fig, ax = plt.subplots(figsize=(8.2, 4.0))
+    ys = np.arange(len(rows))
+    colours = ["#1F845A" if kind == "honest" else "#E56910"
+               for _, _, kind in rows]
+    ax.barh(ys, [v for _, v, _ in rows], 0.58, color=colours)
+    ax.set_yticks(ys, [n for n, _, _ in rows], fontsize=8)
+    ax.invert_yaxis()
+    ax.set_xlim(0, 1.06)
+    ax.set_xlabel("Macro F1 on the shared held-out test split")
+    ax.grid(axis="x", alpha=0.7)
+    ax.set_axisbelow(True)
+
+    for y, (_, v, _) in zip(ys, rows):
+        ax.text(v + 0.012, y, f"{v:.3f}", va="center", fontsize=8.5,
+                fontweight="bold", color=INK)
+
+    band_hi = max(rows[0][1], rows[1][1])
+    ax.axvspan(0, band_hi, color="#1F845A", alpha=0.07, zorder=0)
+    ax.annotate(
+        "two independent methods agree here",
+        xy=(band_hi, 0.5), xytext=(band_hi + 0.13, 0.72),
+        fontsize=7.8, color="#1F845A",
+        arrowprops=dict(arrowstyle="->", color="#1F845A", lw=0.9))
+    ax.annotate(
+        "everything above is bought with\naugmented copies of test subjects",
+        xy=(rows[3][1], 3.0), xytext=(0.40, 3.55),
+        fontsize=7.8, color="#AE2E24",
+        arrowprops=dict(arrowstyle="->", color="#AE2E24", lw=0.9))
+
+    # Outside the axes: every row's bar reaches the right edge, so any in-axes
+    # placement collides with a value label.
+    ax.legend(handles=[
+        Patch(facecolor="#1F845A", label="No augmented data — honest estimate"),
+        Patch(facecolor="#E56910", label="Augmented data included"),
+    ], loc="upper center", bbox_to_anchor=(0.5, -0.16), ncols=2, fontsize=7.8)
+
+    fig.suptitle("Figure 15 — Where the accuracy actually comes from",
+                 y=1.02, fontsize=10.5, x=0.02, ha="left")
+    fig.tight_layout()
+    save(fig, "fig15_convergence")
+
+
 FIGURES = {
     "fig01": fig01_dataset,
     "fig02": fig02_training,
@@ -795,6 +873,7 @@ FIGURES = {
     "fig12": fig12_saliency,
     "fig13": fig13_robustness,
     "fig14": fig14_ablation,
+    "fig15": fig15_convergence,
 }
 
 

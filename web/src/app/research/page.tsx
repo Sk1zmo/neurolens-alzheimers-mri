@@ -165,6 +165,16 @@ const FIGURES = [
       "dataset buys for free.",
   },
   {
+    file: "fig15_convergence.png",
+    title: "Where the accuracy actually comes from",
+    caption:
+      "The paper's central argument in one panel. A CNN trained on real images only, and " +
+      "classical models on segmented morphometry, agree at macro-F1 0.50–0.58 despite sharing " +
+      "no machinery. Every point above that band arrives with augmented copies of the test " +
+      "subjects. Removing the leak filter reaches exactly 1.000 on 1,280 unseen slices, which " +
+      "no genuine evaluation of a hard clinical task should produce.",
+  },
+  {
     file: "fig11_subject_recovery.png",
     title: "Subject recovery — a negative result",
     caption:
@@ -433,6 +443,75 @@ export default async function ResearchPage() {
           </div>
         </section>
       )}
+
+      {/* ---- headline finding --------------------------------------------- */}
+      <section
+        className="mb-6 rounded-md border p-5"
+        style={{
+          borderColor: "color-mix(in srgb, var(--danger) 35%, transparent)",
+          background: "color-mix(in srgb, var(--danger) 7%, transparent)",
+        }}
+      >
+        <span className="lozenge lozenge-danger">Primary finding</span>
+        <h2 className="mt-2.5 text-base font-semibold tracking-tight">
+          The 99.8% is largely leakage, and two controls prove it
+        </h2>
+        <p className="mt-2 max-w-3xl text-[0.875rem] leading-relaxed text-[var(--text-secondary)]">
+          Retrain the identical architecture on <strong>original images only</strong>{" "}
+          and it scores macro-F1 <strong>0.504</strong>. Classical models on seven
+          segmented morphometric indices, same split, reach <strong>0.581</strong>.
+          Two methods sharing no architecture, features or optimiser land in the
+          same band. Everything above it is bought with augmented copies of the
+          test subjects — and because subject identity is irrecoverable from this
+          dataset, no split can repair it. Our own slice-level filter recovered
+          just 0.47 accuracy points.
+        </p>
+        <div className="mt-4 overflow-x-auto scroll-thin">
+          <table className="data-table min-w-[520px]">
+            <thead>
+              <tr>
+                <th>Configuration</th>
+                <th className="text-right">Train n</th>
+                <th className="text-right">Accuracy</th>
+                <th className="text-right">Macro F1</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["Morphometry only (7 indices)", "1,015", "0.5687", "0.5807", true],
+                ["CNN, original images only", "4,160", "0.5930", "0.5042", true],
+                ["CNN + leak-filtered augmented", "26,266", "0.9953", "0.9972", false],
+                ["CNN + all augmented (standard)", "38,144", "1.0000", "1.0000", false],
+              ].map((r) => (
+                <tr key={r[0] as string}>
+                  <td>
+                    <span className="flex items-center gap-2">
+                      <span
+                        className="h-2 w-2 shrink-0 rounded-sm"
+                        style={{
+                          background: r[4] ? "var(--series-3)" : "var(--series-2)",
+                        }}
+                        aria-hidden="true"
+                      />
+                      {r[0]}
+                    </span>
+                  </td>
+                  <td className="tnum text-right">{r[1]}</td>
+                  <td className="tnum text-right">{r[2]}</td>
+                  <td className="tnum text-right font-semibold">{r[3]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-3 text-[0.75rem] leading-relaxed text-[var(--text-muted)]">
+          Green rows use no augmented data and are the honest estimate. The
+          leak filter works at slice level, but each subject contributes ~32
+          slices — an augmented derivative of any one of them discloses that
+          subject whichever slice is tested. No slice-level procedure can fix
+          subject-level leakage.
+        </p>
+      </section>
 
       {/* ---- clinical utility --------------------------------------------- */}
       {exp?.throughput && (

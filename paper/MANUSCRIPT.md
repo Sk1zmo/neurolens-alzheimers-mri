@@ -1,4 +1,4 @@
-# Deep Learning for Alzheimer's Stage Classification from Brain MRI: An Accessible Web-Deployed System and a Morphometric Control That Exposes Benchmark Leakage
+# Deep Learning for Alzheimer's Stage Classification from Brain MRI: An Accessible Web-Deployed System, and Two Controls Showing That Benchmark Accuracy Is Largely Leakage
 
 **[Author One]¹, [Author Two]¹**
 
@@ -33,23 +33,27 @@ template, and integrated over a lobar atlas. Seven morphometric indices were
 segmented per scan. As a control, classical models were trained on those
 indices alone using the identical split.
 
-**Results:** On 1,280 held-out original slices the network reached 99.84%
-accuracy (95% CI 99.61–100), macro-F1 0.9991, and quadratic weighted kappa
-0.9986; calibration improved expected calibration error from 0.0503 to 0.0011.
-All seven morphometric indices separated the four stages (one-way ANOVA, p from
-6×10⁻⁵ to 3×10⁻⁹¹; η² up to 0.237). However, the best classical model built on
-those same indices reached only macro-F1 0.5807 on the identical split, a gap
-of 0.418. Silhouette coefficient was 0.94 in the network's logit space but
-−0.05 in morphometric space, and validation macro-F1 saturated at exactly
-1.000. Inference required 17 ms on CPU (490 full reports/min; US$0.0039 per
-1,000 scans).
+**Results:** Following the standard protocol, the network reached 99.84%
+accuracy (95% CI 99.61–100) and macro-F1 0.9991 on 1,280 held-out original
+slices, with expected calibration error improving from 0.0503 to 0.0011 after
+temperature scaling. Two controls contradict that figure. First, the best
+classical model trained on the seven morphometric indices using the identical
+split reached macro-F1 0.5807, despite those indices separating the stages with
+very large effect sizes (ANOVA p from 6×10⁻⁵ to 3×10⁻⁹¹; η² to 0.237). Second,
+an ablation retraining the same network on **original images only** reached
+macro-F1 0.5042 — closely agreeing with the morphometric control despite
+sharing no machinery with it. Adding augmented images raised macro-F1 to 0.9972,
+and removing our leakage filter raised it to exactly 1.0000. Silhouette
+coefficient was 0.94 in logit space but −0.05 in morphometric space. Inference
+required 17 ms on CPU (490 full reports/min; US$0.0039 per 1,000 scans).
 
-**Conclusion:** The system is accurate, calibrated, anatomically explainable
-and deployable at negligible cost on commodity hardware. The morphometric
-control, however, demonstrates that headline accuracy on this benchmark is
-substantially inflated by subject-level leakage rather than reflecting disease
-staging. We propose the morphometric baseline as a routine control for
-imaging-classification studies.
+**Conclusion:** The near-perfect accuracy widely reported on this benchmark is
+an artefact of augmented copies of test subjects, not evidence of disease
+staging; two independent controls place the honest performance of this
+architecture near macro-F1 0.50–0.58. The deployed system remains valuable as
+accessible, calibrated and anatomically explainable infrastructure. We propose
+the morphometric baseline and the original-only ablation as routine controls
+for medical imaging classification studies.
 
 **Keywords:** Alzheimer's disease, magnetic resonance imaging, deep learning,
 class activation mapping, dataset leakage, morphometry.
@@ -276,7 +280,7 @@ Figure 6).
 | Cortical rim fraction | 0.383 | 0.344 | 0.319 | 0.320 | 0.212 | −0.437 | 3×10⁻⁸⁰ |
 | Grey/white ratio | 0.477 | 0.408 | 0.379 | 0.384 | 0.237 | −0.450 | 3×10⁻⁹¹ |
 
-### The morphometric control
+### Control 1: the morphometric baseline
 
 Despite those highly significant differences, classical models trained on the
 same indices and evaluated on the identical split performed far below the
@@ -291,15 +295,44 @@ network (Table 3).
 | Linear discriminant analysis | 0.4569 | 0.3365 |
 | Random forest | 0.5815 | 0.5574 |
 | Histogram gradient boosting | 0.5687 | 0.5807 |
-| **EfficientNet-B0 (this work)** | **0.9984** | **0.9991** |
+| **EfficientNet-B0, standard protocol** | **0.9984** | **0.9991** |
 
 The gap is 0.418 macro-F1. Silhouette coefficient was 0.94 in the network's
 logit space but −0.05 in morphometric space, indicating that the morphometric
-features form essentially no cluster structure by stage even though their
-group means differ. A learning curve on the morphometric features was flat from
-n = 58 to n = 1,173 (macro-F1 0.360 to 0.374), showing the ceiling is a
-property of the features, not of sample size. Validation macro-F1 during
-training saturated at exactly 1.000 from epoch 16 onwards (Figure 2).
+features form essentially no cluster structure by stage even though their group
+means differ. A learning curve on those features was flat from n = 58 to
+n = 1,173 (macro-F1 0.360 to 0.374), showing the ceiling is a property of the
+features, not of sample size.
+
+### Control 2: the original-only ablation
+
+Four training configurations were compared under an identical shortened
+schedule on the shared test split (Table 4, Figures 14 and 15).
+
+**Table 4. Ablation across training data configurations.**
+
+| Configuration | Train n | Accuracy | Macro F1 |
+| --- | --- | --- | --- |
+| Original images only | 4,160 | 0.5930 | 0.5042 |
+| Leak-filtered augmented + original | 26,266 | 0.9953 | 0.9972 |
+| All augmented + original (standard protocol) | 38,144 | 1.0000 | 1.0000 |
+| Leak-filtered, no class balancing | 26,266 | 0.9977 | 0.9981 |
+
+Trained on real images alone, the network reached macro-F1 0.5042 — closely
+agreeing with the morphometric control's 0.5807 despite the two approaches
+sharing no architecture, features or optimisation procedure. Introducing
+augmented images raised macro-F1 by approximately 0.49 to 0.9972, and removing
+our leakage filter produced a perfect score of exactly 1.0000 on 1,280 unseen
+slices. Validation macro-F1 during full-schedule training likewise saturated at
+exactly 1.000 from epoch 16 onwards (Figure 2).
+
+The leakage filter therefore reduced but did not eliminate the effect,
+recovering only 0.47 accuracy points. This is expected on reflection: the
+filter operates at slice level, removing augmented images derived from
+held-out slices, whereas each subject contributes approximately 32 slices. An
+augmented derivative of one slice of a test subject still discloses that
+subject's anatomy when a different slice of the same subject is the test item.
+No slice-level procedure can repair subject-level leakage.
 
 ### Explainability
 
@@ -341,32 +374,55 @@ their reference ranges and the literature behind them are explicit, which is
 what informal clinician-to-clinician knowledge transfer currently is not.
 
 **The headline accuracy, however, should not be believed as a measure of
-disease staging.** Our morphometric control is the reason. The seven indices we
-measure are the established structural correlates of the disease, and they do
-differ across stages with very large effect sizes. Yet every classical model
-built on them plateaus near macro-F1 0.58 on the identical split, while the
-network reports 0.9991. A network genuinely reading atrophy should not
-outperform the combined measurable atrophy signal by 42 points. Three further
-observations agree: silhouette in morphometric space is approximately zero, so
-the stages do not form separable clusters in the space of measurable anatomy;
-the morphometric learning curve is flat, so the shortfall is not a sample-size
-artefact; and validation accuracy saturates at exactly 1.000, which a genuinely
-held-out set should not.
+disease staging.** Two controls, sharing no machinery with each other, converge
+on the same conclusion (Figure 15).
 
-The most parsimonious explanation is that the network is substantially
-recognising individual brains rather than disease stage. The dataset provides
-approximately 32 slices per subject, and subject identity is destroyed and — as
-we showed — irrecoverable, so no partition of these files can separate
-subjects. Adjacent slices of one brain therefore appear on both sides of any
-split, and a network with sufficient capacity can exploit that.
+The first is the morphometric baseline. The seven indices we measure are the
+established structural correlates of the disease, and they do differ across
+stages with very large effect sizes. Yet every classical model built on them
+plateaus near macro-F1 0.58 on the identical split, while the network reports
+0.9991. A network genuinely reading atrophy should not outperform the combined
+measurable atrophy signal by 42 points.
 
-This has a constructive consequence. **We propose the morphometry-only baseline
-as a routine control** for medical-imaging classification studies. It is cheap,
-uses no additional data, and provides an interpretable lower bound: when a deep
-model vastly exceeds every domain-relevant measurement computed from the same
-images, that gap is a signal to investigate leakage rather than a result to
-report. Applied to the published literature on this benchmark, where accuracies
-above 99% are routine, the control would be informative.
+The second is decisive. Retraining the identical architecture on **original
+images only** yields macro-F1 0.5042 — within the same band as the
+morphometric control, reached by an entirely different route. Adding augmented
+images lifts the same architecture, on the same test set, by approximately 0.49
+macro-F1. Nothing about the disease changed between those two runs; only the
+presence of augmented copies of the training subjects did. Removing our leakage
+filter takes the score to exactly 1.0000, which no genuine held-out evaluation
+of a hard clinical task should produce.
+
+Three further observations agree: silhouette in morphometric space is
+approximately zero, so the stages do not form separable clusters in the space
+of measurable anatomy; the morphometric learning curve is flat, so the
+shortfall is not a sample-size artefact; and validation accuracy saturates at
+exactly 1.000 from epoch 16.
+
+The parsimonious explanation is that the network is substantially recognising
+individual brains rather than disease stage. The dataset provides approximately
+32 slices per subject, and subject identity is destroyed and — as we showed —
+irrecoverable, so no partition of these files can separate subjects. Adjacent
+slices of one brain appear on both sides of any split, and a network with
+sufficient capacity exploits that. Our own filter illustrates the limit
+precisely: operating at slice level it recovered only 0.47 accuracy points,
+because an augmented derivative of *any* slice of a test subject discloses that
+subject regardless of which slice is being tested.
+
+**The honest estimate for this architecture on this task is therefore
+approximately macro-F1 0.50–0.58**, not 0.999 — a figure consistent with the
+genuine difficulty of staging Alzheimer's disease from a single axial slice
+that does not even include the hippocampus.
+
+This has a constructive consequence. **We propose two cheap controls as routine
+practice** in medical imaging classification. The morphometry-only baseline
+provides an interpretable lower bound from domain measurements on the same
+images; when a deep model vastly exceeds it, that gap is a signal to
+investigate leakage rather than a result to report. The original-only ablation
+isolates the contribution of augmented data directly. Neither requires
+additional data collection, both take hours rather than weeks, and applied to
+the published literature on this benchmark — where accuracies above 99% are
+routine — they would be informative.
 
 We note limitations beyond leakage. Analysis is confined to a single axial
 level, so the hippocampus — the earliest and best-validated site of atrophy in
@@ -389,14 +445,23 @@ device.
 We present a calibrated, anatomically explainable Alzheimer's stage classifier
 that runs at 17 ms on CPU for fractions of a cent per thousand scans and is
 accessible from any browser, together with a structured morphometric report
-grounded in citable literature. On the standard public benchmark it reaches
-99.84% accuracy. Using a morphometry-only control on the identical split, we
-show that this figure is substantially inflated by subject-level leakage that
-the dataset makes unavoidable, and we propose that control as routine practice.
-The engineering contribution — accessibility, calibration, anatomical
-explanation, negligible cost — stands independently of the benchmark number,
-and is where the clinical value of such systems in resource-limited settings
-actually lies.
+grounded in citable literature. Following the standard protocol it reaches
+99.84% accuracy on the public benchmark. Two independent controls — a
+morphometry-only baseline and an original-images-only ablation, both on the
+identical split — place the honest performance of this architecture near
+macro-F1 0.50–0.58 and show that the remainder is purchased with augmented
+copies of the test subjects. Because subject identity is irrecoverable from the
+redistributed data, no partitioning strategy can repair this, and our own
+slice-level filter recovered less than half an accuracy point.
+
+We therefore report a negative methodological result alongside a positive
+engineering one. The near-perfect accuracies routinely published on this
+benchmark should not be read as evidence of disease staging, and the two
+controls we describe are cheap enough to be applied as a matter of course. The
+deployed system's value — accessibility, calibration, anatomical explanation,
+negligible cost — stands independently of the benchmark number, and is where
+the clinical contribution of such systems in resource-limited settings actually
+lies.
 
 ---
 
