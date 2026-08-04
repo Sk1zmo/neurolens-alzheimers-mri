@@ -138,6 +138,78 @@ python training/qc_anatomy.py     # renders one QC panel per stage
 
 ---
 
+## Clinical input formats
+
+`web/api/_medical_io.py` accepts a DICOM instance, a zipped DICOM series, a
+NIfTI volume, or a plain image.
+
+**Windowing is applied properly.** Stored DICOM values are not display values:
+the modality LUT (`RescaleSlope`/`RescaleIntercept`) must be applied before the
+VOI LUT (`WindowCenter`/`WindowWidth`), and `MONOCHROME1` inverts. A DICOM read
+as raw integers and min/max-scaled looks plausible and is wrong.
+
+**Plane comes from the header, not the pixels.** `ImageOrientationPatient`
+holds the row and column direction cosines; their cross product is the slice
+normal, and whichever patient axis it aligns with names the plane. A coronal or
+sagittal series is flagged rather than silently classified.
+
+**Volumes select their own slice.** The model was trained at one axial level, so
+handing it an arbitrary slice yields a confident answer about anatomy it has
+never seen. `select_axial_slice` scores every slice on cross-sectional area,
+mirror symmetry and central CSF, takes the peak, and averages the prediction
+over its neighbours — a single slice is one noisy sample of a 3-D process.
+`slice_agreement` reports how often neighbouring slices agree, and a low value
+is surfaced as a warning.
+
+---
+
+## Experiments
+
+```bash
+python training/experiments.py --all      # uncertainty, saliency, robustness, throughput
+python training/ablation.py               # leak filter, augmentation, balancing
+python training/external_validation.py --root /data/cohort --name MIRIAD
+python training/make_reader_study.py      # blinded case set for /rate
+```
+
+Measured results:
+
+| Experiment | Result |
+| --- | --- |
+| Throughput | 17 ms classify, 119 ms full report, 490 reports/min, **$0.0039 per 1000 scans**, CPU-only |
+| Selective prediction | Degenerate on the clean split (too few errors to rank). Under noise, free energy is the best deferral signal (AURC 0.275) |
+| Saliency | **Insertion passes** (0.841 vs 0.482 random); **deletion fails** (0.632 vs 0.476) |
+| Robustness | Tolerant of rotation and contrast; fragile to noise (36% at σ=0.25) and blur (18% at 5 px) |
+
+The saliency split verdict is reported rather than resolved in the method's
+favour. Deletion blurs the highest-attention pixels — but the CAM concentrates
+on the ventricles, which are homogeneous, so blurring them removes little
+information however important they are. Insertion against a random control is
+the informative test on this data, and it passes decisively.
+
+### A negative result worth keeping
+
+`recover_subjects.py` tested whether subject identity survives in the slice
+ordering. The class counts are exactly 100/70/28/2 subjects × 32 slices, which
+matches the OASIS-1 CDR breakdown, so contiguous per-subject blocks looked
+likely. **They are not there**: within-block and across-boundary similarity are
+identical (0.893 vs 0.889) and the best-fitting block length differs per class
+(20, 49, 56, 16). The script refuses to emit pseudo-subjects rather than
+manufacture a clean-looking split.
+
+Subject-level splitting therefore needs the original OASIS-1 download. Once you
+have it:
+
+```bash
+python training/external_validation.py \
+    --oasis-csv oasis_cross-sectional.csv --scans-root /data/oasis1 --name OASIS-1
+```
+
+That path keeps the subject ID, which is what makes `GroupKFold` possible and
+what removes the standing caveat on every accuracy figure here.
+
+---
+
 ## Research artifacts
 
 ```bash
