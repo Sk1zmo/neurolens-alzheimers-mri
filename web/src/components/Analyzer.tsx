@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import AnatomyReport from "@/components/AnatomyReport";
 import Dropzone from "@/components/Dropzone";
 import ProbabilityBars from "@/components/ProbabilityBars";
 import ScanViewer from "@/components/ScanViewer";
@@ -416,6 +417,12 @@ export default function Analyzer() {
                 )}
               </div>
             )}
+
+            {/* anatomical localisation, morphometry and findings */}
+            <AnatomyReport
+              anatomy={result.anatomy}
+              report={result.report}
+            />
 
             {/* model context */}
             <div className="card p-5">

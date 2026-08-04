@@ -234,7 +234,8 @@ def scan_plausibility(img: Image.Image) -> dict[str, Any]:
 
 
 # ------------------------------------------------------------------ predict
-def predict(data: bytes, want_overlay: bool = True) -> dict[str, Any]:
+def predict(data: bytes, want_overlay: bool = True,
+            want_anatomy: bool = True) -> dict[str, Any]:
     meta = get_meta()
     img = load_image(data)
     session = get_session()
@@ -261,7 +262,27 @@ def predict(data: bytes, want_overlay: bool = True) -> dict[str, Any]:
     if want_overlay:
         overlay, cam_png = render_overlay(img, cam[idx])
 
+    # Anatomical localisation and morphometry. Isolated behind try/except so a
+    # segmentation failure on an unusual input degrades to "classification
+    # only" rather than failing the whole request.
+    anatomy = report = None
+    if want_anatomy:
+        try:
+            import _anatomy
+            import _findings
+        except ImportError:  # pragma: no cover - depends on Vercel's sys.path
+            from api import _anatomy, _findings  # type: ignore
+        try:
+            anatomy = _anatomy.analyse(img, cam[idx])
+            report = _findings.generate(
+                anatomy, {"label": meta["classes"][idx]})
+        except Exception as e:  # noqa: BLE001
+            anatomy = {"error": f"{type(e).__name__}: {e}"}
+            report = None
+
     return {
+        "anatomy": anatomy,
+        "report": report,
         "ok": True,
         "class_id": idx,
         "label": meta["classes"][idx],

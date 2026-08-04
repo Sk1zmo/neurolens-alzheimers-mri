@@ -1,0 +1,764 @@
+{
+  "n_test": 1280,
+  "n_bootstrap": 2000,
+  "headline": {
+    "accuracy": {
+      "value": 0.9984375,
+      "ci95_low": 0.99609375,
+      "ci95_high": 1.0
+    },
+    "balanced_accuracy": {
+      "value": 0.9988839285714286,
+      "ci95_low": 0.9971395881006865,
+      "ci95_high": 1.0
+    },
+    "macro_f1": {
+      "value": 0.9990507002830449,
+      "ci95_low": 0.9976038634184681,
+      "ci95_high": 1.0
+    },
+    "weighted_f1": {
+      "value": 0.9984369710358884,
+      "ci95_low": 0.9960900593566696,
+      "ci95_high": 1.0
+    },
+    "cohen_kappa": {
+      "value": 0.997428433092048,
+      "ci95_low": 0.9935146125518994,
+      "ci95_high": 1.0
+    }
+  },
+  "per_class": {
+    "Non Demented": {
+      "precision": 0.9968847352024922,
+      "recall": 1.0,
+      "f1": 0.9984399375975039,
+      "support": 640,
+      "auc": 1.0,
+      "average_precision": 1.0,
+      "recall_wilson_ci95": [
+        0.9940333150265532,
+        1.0
+      ]
+    },
+    "Very Mild Demented": {
+      "precision": 1.0,
+      "recall": 0.9955357142857143,
+      "f1": 0.9977628635346756,
+      "support": 448,
+      "auc": 1.0,
+      "average_precision": 1.0,
+      "recall_wilson_ci95": [
+        0.9838703430328064,
+        0.9987749025576838
+      ]
+    },
+    "Mild Demented": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 179,
+      "auc": 1.0,
+      "average_precision": 1.0,
+      "recall_wilson_ci95": [
+        0.9789894641044491,
+        1.0
+      ]
+    },
+    "Moderate Demented": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 13,
+      "auc": 1.0,
+      "average_precision": 1.0,
+      "recall_wilson_ci95": [
+        0.7718981569447083,
+        1.0
+      ]
+    }
+  },
+  "confusion_matrix": [
+    [
+      640,
+      0,
+      0,
+      0
+    ],
+    [
+      2,
+      446,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      179,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      13
+    ]
+  ],
+  "error_analysis": {
+    "total_errors": 2,
+    "adjacent_stage_errors": 2,
+    "adjacent_fraction": 1.0,
+    "note": "Misclassifications that land on a neighbouring severity stage are clinically less costly than distant ones."
+  },
+  "morphometry": {
+    "ventricle_brain_ratio": {
+      "label": "Ventricle-to-brain ratio",
+      "by_class": {
+        "NonDemented": {
+          "mean": 0.061530199069681525,
+          "sd": 0.030956433254312812,
+          "n": 500
+        },
+        "VeryMildDemented": {
+          "mean": 0.07501776535576672,
+          "sd": 0.035391665505685156,
+          "n": 500
+        },
+        "MildDemented": {
+          "mean": 0.08766031727088162,
+          "sd": 0.03592573414256439,
+          "n": 500
+        },
+        "ModerateDemented": {
+          "mean": 0.0895864287321211,
+          "sd": 0.029488145668966518,
+          "n": 64
+        }
+      },
+      "anova_F": 53.17944124509885,
+      "anova_p": 1.0024613069157753e-32,
+      "eta_squared": 0.09277974298865095,
+      "spearman_rho_vs_severity": 0.32379889986893917,
+      "spearman_p": 1.6775154084160846e-39,
+      "cliffs_delta_moderate_vs_none": 0.5251250000000001
+    },
+    "csf_fraction": {
+      "label": "Total CSF fraction",
+      "by_class": {
+        "NonDemented": {
+          "mean": 0.16899048255625046,
+          "sd": 0.031121350329701727,
+          "n": 500
+        },
+        "VeryMildDemented": {
+          "mean": 0.1855477473968241,
+          "sd": 0.026153233946989523,
+          "n": 500
+        },
+        "MildDemented": {
+          "mean": 0.20098492883271624,
+          "sd": 0.024662674915651224,
+          "n": 500
+        },
+        "ModerateDemented": {
+          "mean": 0.21102476590288624,
+          "sd": 0.02869904910885438,
+          "n": 64
+        }
+      },
+      "anova_F": 130.8940565164113,
+      "anova_p": 1.2476296330973058e-75,
+      "eta_squared": 0.2010988657923181,
+      "spearman_rho_vs_severity": 0.4433904619046537,
+      "spearman_p": 2.575973573822736e-76,
+      "cliffs_delta_moderate_vs_none": 0.6683125000000001
+    },
+    "sulcal_csf_fraction": {
+      "label": "Sulcal CSF fraction",
+      "by_class": {
+        "NonDemented": {
+          "mean": 0.10746028348656896,
+          "sd": 0.023017379858278578,
+          "n": 500
+        },
+        "VeryMildDemented": {
+          "mean": 0.11052998204105736,
+          "sd": 0.02744623973823557,
+          "n": 500
+        },
+        "MildDemented": {
+          "mean": 0.11332461156183461,
+          "sd": 0.029593979376947837,
+          "n": 500
+        },
+        "ModerateDemented": {
+          "mean": 0.12143833717076517,
+          "sd": 0.026653679039305694,
+          "n": 64
+        }
+      },
+      "anova_F": 7.4294129739568735,
+      "anova_p": 6.106891025583058e-05,
+      "eta_squared": 0.014086080129785426,
+      "spearman_rho_vs_severity": 0.10220853150619513,
+      "spearman_p": 5.1335351818481854e-05,
+      "cliffs_delta_moderate_vs_none": 0.2726249999999999
+    },
+    "parenchymal_fraction": {
+      "label": "Brain parenchymal fraction",
+      "by_class": {
+        "NonDemented": {
+          "mean": 0.8310095174437495,
+          "sd": 0.031121350329701727,
+          "n": 500
+        },
+        "VeryMildDemented": {
+          "mean": 0.8144522526031758,
+          "sd": 0.026153233946989526,
+          "n": 500
+        },
+        "MildDemented": {
+          "mean": 0.7990150711672838,
+          "sd": 0.024662674915651224,
+          "n": 500
+        },
+        "ModerateDemented": {
+          "mean": 0.7889752340971137,
+          "sd": 0.028699049108854378,
+          "n": 64
+        }
+      },
+      "anova_F": 130.8940565164114,
+      "anova_p": 1.2476296330971708e-75,
+      "eta_squared": 0.20109886579231784,
+      "spearman_rho_vs_severity": -0.4433904619046537,
+      "spearman_p": 2.575973573822736e-76,
+      "cliffs_delta_moderate_vs_none": -0.6683125
+    },
+    "ventricle_asymmetry": {
+      "label": "Ventricular asymmetry",
+      "by_class": {
+        "NonDemented": {
+          "mean": 0.09040931391241097,
+          "sd": 0.07836301699442516,
+          "n": 500
+        },
+        "VeryMildDemented": {
+          "mean": 0.09216641555491248,
+          "sd": 0.08183614614299314,
+          "n": 500
+        },
+        "MildDemented": {
+          "mean": 0.11356435881541674,
+          "sd": 0.08643021129882407,
+          "n": 500
+        },
+        "ModerateDemented": {
+          "mean": 0.11421078466286422,
+          "sd": 0.07654448876937936,
+          "n": 64
+        }
+      },
+      "anova_F": 8.9577929239061,
+      "anova_p": 6.960458048995544e-06,
+      "eta_squared": 0.016934797149674916,
+      "spearman_rho_vs_severity": 0.1278487654434569,
+      "spearman_p": 3.918413953736659e-07,
+      "cliffs_delta_moderate_vs_none": 0.19737500000000008
+    },
+    "cortical_rim_fraction": {
+      "label": "Cortical rim fraction",
+      "by_class": {
+        "NonDemented": {
+          "mean": 0.38290686689583664,
+          "sd": 0.06145972676100995,
+          "n": 500
+        },
+        "VeryMildDemented": {
+          "mean": 0.3438889288220539,
+          "sd": 0.049818203793394376,
+          "n": 500
+        },
+        "MildDemented": {
+          "mean": 0.31889511038686635,
+          "sd": 0.041172895796146115,
+          "n": 500
+        },
+        "ModerateDemented": {
+          "mean": 0.3198460204329965,
+          "sd": 0.03693784655728311,
+          "n": 64
+        }
+      },
+      "anova_F": 139.94961197914722,
+      "anova_p": 2.6740668586257714e-80,
+      "eta_squared": 0.21206105653952434,
+      "spearman_rho_vs_severity": -0.4368527598836295,
+      "spearman_p": 6.890589705768205e-74,
+      "cliffs_delta_moderate_vs_none": -0.6013125
+    },
+    "grey_white_ratio": {
+      "label": "Grey/white ratio",
+      "by_class": {
+        "NonDemented": {
+          "mean": 0.47688422845676304,
+          "sd": 0.09895229374348712,
+          "n": 500
+        },
+        "VeryMildDemented": {
+          "mean": 0.40767909424701837,
+          "sd": 0.06427941023707522,
+          "n": 500
+        },
+        "MildDemented": {
+          "mean": 0.3786867023002147,
+          "sd": 0.05416244439317896,
+          "n": 500
+        },
+        "ModerateDemented": {
+          "mean": 0.38398558427326956,
+          "sd": 0.027995707101630102,
+          "n": 64
+        }
+      },
+      "anova_F": 161.63068903874418,
+      "anova_p": 3.1722877470955365e-91,
+      "eta_squared": 0.23712355038867267,
+      "spearman_rho_vs_severity": -0.4499187782196703,
+      "spearman_p": 8.581526873678106e-79,
+      "cliffs_delta_moderate_vs_none": -0.618375
+    }
+  },
+  "attention_by_region": {
+    "frontal_left": {
+      "name": "Left frontal lobe",
+      "lobe": "frontal",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 1.2212291955947876,
+          "sd": 0.361318439245224
+        },
+        "VeryMildDemented": {
+          "mean_density": 1.197974443435669,
+          "sd": 0.26764076948165894
+        },
+        "MildDemented": {
+          "mean_density": 1.2859373092651367,
+          "sd": 0.5700052380561829
+        },
+        "ModerateDemented": {
+          "mean_density": 1.8946324586868286,
+          "sd": 0.25512126088142395
+        }
+      },
+      "anova_F": 16.641441345214844,
+      "anova_p": 1.309880537370134e-10,
+      "eta_squared": 0.03765246272087097
+    },
+    "temporal_left": {
+      "name": "Left temporal region",
+      "lobe": "temporal",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 0.6486170887947083,
+          "sd": 0.20227324962615967
+        },
+        "VeryMildDemented": {
+          "mean_density": 0.8806799650192261,
+          "sd": 0.2531432509422302
+        },
+        "MildDemented": {
+          "mean_density": 0.6612733602523804,
+          "sd": 0.2904183566570282
+        },
+        "ModerateDemented": {
+          "mean_density": 0.2933788597583771,
+          "sd": 0.09992852807044983
+        }
+      },
+      "anova_F": 107.84600830078125,
+      "anova_p": 0.0,
+      "eta_squared": 0.2022697478532791
+    },
+    "parietal_left": {
+      "name": "Left parietal lobe",
+      "lobe": "parietal",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 0.8876327276229858,
+          "sd": 0.325969934463501
+        },
+        "VeryMildDemented": {
+          "mean_density": 0.8369649052619934,
+          "sd": 0.20816731452941895
+        },
+        "MildDemented": {
+          "mean_density": 0.7370834946632385,
+          "sd": 0.3376789391040802
+        },
+        "ModerateDemented": {
+          "mean_density": 0.37290728092193604,
+          "sd": 0.07494593411684036
+        }
+      },
+      "anova_F": 24.38876724243164,
+      "anova_p": 2.3933265325761e-15,
+      "eta_squared": 0.05423076078295708
+    },
+    "occipital_left": {
+      "name": "Left occipital lobe",
+      "lobe": "occipital",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 1.1781995296478271,
+          "sd": 0.5137441158294678
+        },
+        "VeryMildDemented": {
+          "mean_density": 0.9881333112716675,
+          "sd": 0.33312690258026123
+        },
+        "MildDemented": {
+          "mean_density": 1.0246590375900269,
+          "sd": 0.6103454828262329
+        },
+        "ModerateDemented": {
+          "mean_density": 0.6284216642379761,
+          "sd": 0.16711987555027008
+        }
+      },
+      "anova_F": 19.593505859375,
+      "anova_p": 2.0205512610282916e-12,
+      "eta_squared": 0.0440375916659832
+    },
+    "insular_left": {
+      "name": "Left insular / peri-sylvian region",
+      "lobe": "insular",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 0.7215862274169922,
+          "sd": 0.2071927934885025
+        },
+        "VeryMildDemented": {
+          "mean_density": 0.9968104958534241,
+          "sd": 0.22217166423797607
+        },
+        "MildDemented": {
+          "mean_density": 1.068000316619873,
+          "sd": 0.3655158281326294
+        },
+        "ModerateDemented": {
+          "mean_density": 0.4981342554092407,
+          "sd": 0.09208685904741287
+        }
+      },
+      "anova_F": 174.309326171875,
+      "anova_p": 0.0,
+      "eta_squared": 0.29068854451179504
+    },
+    "periventricular_left": {
+      "name": "Left periventricular white matter",
+      "lobe": "white matter",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 1.0511175394058228,
+          "sd": 0.1844279021024704
+        },
+        "VeryMildDemented": {
+          "mean_density": 1.0328279733657837,
+          "sd": 0.1772172898054123
+        },
+        "MildDemented": {
+          "mean_density": 1.2746765613555908,
+          "sd": 0.2523975074291229
+        },
+        "ModerateDemented": {
+          "mean_density": 0.9531484246253967,
+          "sd": 0.06973056495189667
+        }
+      },
+      "anova_F": 76.5682144165039,
+      "anova_p": 0.0,
+      "eta_squared": 0.15255621075630188
+    },
+    "basal_ganglia_left": {
+      "name": "Left thalamus / basal ganglia",
+      "lobe": "deep grey",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 1.0438334941864014,
+          "sd": 0.23881766200065613
+        },
+        "VeryMildDemented": {
+          "mean_density": 1.0460418462753296,
+          "sd": 0.23407669365406036
+        },
+        "MildDemented": {
+          "mean_density": 1.257816195487976,
+          "sd": 0.3065081536769867
+        },
+        "ModerateDemented": {
+          "mean_density": 0.8645864725112915,
+          "sd": 0.053921762853860855
+        }
+      },
+      "anova_F": 41.32497024536133,
+      "anova_p": 1.7385606882552727e-25,
+      "eta_squared": 0.08855511993169785
+    },
+    "frontal_right": {
+      "name": "Right frontal lobe",
+      "lobe": "frontal",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 1.2288436889648438,
+          "sd": 0.3914952576160431
+        },
+        "VeryMildDemented": {
+          "mean_density": 1.1673717498779297,
+          "sd": 0.26153564453125
+        },
+        "MildDemented": {
+          "mean_density": 1.2240508794784546,
+          "sd": 0.5309141874313354
+        },
+        "ModerateDemented": {
+          "mean_density": 1.9018142223358154,
+          "sd": 0.12288813292980194
+        }
+      },
+      "anova_F": 17.318286895751953,
+      "anova_p": 5.0261513701022054e-11,
+      "eta_squared": 0.039123956114053726
+    },
+    "temporal_right": {
+      "name": "Right temporal region",
+      "lobe": "temporal",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 0.6863497495651245,
+          "sd": 0.18871454894542694
+        },
+        "VeryMildDemented": {
+          "mean_density": 0.8206135630607605,
+          "sd": 0.23166169226169586
+        },
+        "MildDemented": {
+          "mean_density": 0.5974076986312866,
+          "sd": 0.28107714653015137
+        },
+        "ModerateDemented": {
+          "mean_density": 0.482776015996933,
+          "sd": 0.25773346424102783
+        }
+      },
+      "anova_F": 59.92662048339844,
+      "anova_p": 3.0271024308393046e-36,
+      "eta_squared": 0.1234937310218811
+    },
+    "parietal_right": {
+      "name": "Right parietal lobe",
+      "lobe": "parietal",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 0.7973769903182983,
+          "sd": 0.2560335695743561
+        },
+        "VeryMildDemented": {
+          "mean_density": 0.7951781153678894,
+          "sd": 0.19827286899089813
+        },
+        "MildDemented": {
+          "mean_density": 0.6283833384513855,
+          "sd": 0.29562777280807495
+        },
+        "ModerateDemented": {
+          "mean_density": 0.40356573462486267,
+          "sd": 0.08534014225006104
+        }
+      },
+      "anova_F": 34.53300094604492,
+      "anova_p": 1.8511732614472062e-21,
+      "eta_squared": 0.07509356737136841
+    },
+    "occipital_right": {
+      "name": "Right occipital lobe",
+      "lobe": "occipital",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 1.066887617111206,
+          "sd": 0.4246583580970764
+        },
+        "VeryMildDemented": {
+          "mean_density": 0.9416428804397583,
+          "sd": 0.2731584310531616
+        },
+        "MildDemented": {
+          "mean_density": 0.8820943832397461,
+          "sd": 0.5358172655105591
+        },
+        "ModerateDemented": {
+          "mean_density": 0.6387404799461365,
+          "sd": 0.2099076807498932
+        }
+      },
+      "anova_F": 18.075565338134766,
+      "anova_p": 1.7227023627053306e-11,
+      "eta_squared": 0.04076499119400978
+    },
+    "insular_right": {
+      "name": "Right insular / peri-sylvian region",
+      "lobe": "insular",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 0.7235066294670105,
+          "sd": 0.1952170878648758
+        },
+        "VeryMildDemented": {
+          "mean_density": 0.9189977645874023,
+          "sd": 0.2219536453485489
+        },
+        "MildDemented": {
+          "mean_density": 0.8398725390434265,
+          "sd": 0.33566373586654663
+        },
+        "ModerateDemented": {
+          "mean_density": 0.7649884819984436,
+          "sd": 0.24145185947418213
+        }
+      },
+      "anova_F": 65.2247314453125,
+      "anova_p": 3.058687025601923e-39,
+      "eta_squared": 0.13296033442020416
+    },
+    "periventricular_right": {
+      "name": "Right periventricular white matter",
+      "lobe": "white matter",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 0.9909370541572571,
+          "sd": 0.14666710793972015
+        },
+        "VeryMildDemented": {
+          "mean_density": 0.9864386320114136,
+          "sd": 0.18297189474105835
+        },
+        "MildDemented": {
+          "mean_density": 1.1057844161987305,
+          "sd": 0.22946350276470184
+        },
+        "ModerateDemented": {
+          "mean_density": 1.0593501329421997,
+          "sd": 0.1667768508195877
+        }
+      },
+      "anova_F": 23.647863388061523,
+      "anova_p": 6.756133840042904e-15,
+      "eta_squared": 0.052670035511255264
+    },
+    "basal_ganglia_right": {
+      "name": "Right thalamus / basal ganglia",
+      "lobe": "deep grey",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 0.9688675999641418,
+          "sd": 0.19272390007972717
+        },
+        "VeryMildDemented": {
+          "mean_density": 0.9916682839393616,
+          "sd": 0.231356680393219
+        },
+        "MildDemented": {
+          "mean_density": 1.088775634765625,
+          "sd": 0.2927676737308502
+        },
+        "ModerateDemented": {
+          "mean_density": 0.9561634063720703,
+          "sd": 0.13291902840137482
+        }
+      },
+      "anova_F": 13.69611930847168,
+      "anova_p": 8.526740202796645e-09,
+      "eta_squared": 0.031196335330605507
+    },
+    "ventricles": {
+      "name": "Lateral ventricles",
+      "lobe": "ventricular system",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 1.1052823066711426,
+          "sd": 0.13416269421577454
+        },
+        "VeryMildDemented": {
+          "mean_density": 1.039865493774414,
+          "sd": 0.13510219752788544
+        },
+        "MildDemented": {
+          "mean_density": 1.2201868295669556,
+          "sd": 0.14741846919059753
+        },
+        "ModerateDemented": {
+          "mean_density": 1.1433570384979248,
+          "sd": 0.0916517898440361
+        }
+      },
+      "anova_F": 76.43190002441406,
+      "anova_p": 0.0,
+      "eta_squared": 0.15232603251934052
+    },
+    "corpus_callosum_genu": {
+      "name": "Corpus callosum (genu)",
+      "lobe": "commissural",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 1.242408037185669,
+          "sd": 0.3947387933731079
+        },
+        "VeryMildDemented": {
+          "mean_density": 1.1253697872161865,
+          "sd": 0.265282541513443
+        },
+        "MildDemented": {
+          "mean_density": 1.6929748058319092,
+          "sd": 0.6304261088371277
+        },
+        "ModerateDemented": {
+          "mean_density": 2.1344170570373535,
+          "sd": 0.29485878348350525
+        }
+      },
+      "anova_F": 108.17417907714844,
+      "anova_p": 0.0,
+      "eta_squared": 0.20276029407978058
+    },
+    "corpus_callosum_splenium": {
+      "name": "Corpus callosum (splenium)",
+      "lobe": "commissural",
+      "by_class": {
+        "NonDemented": {
+          "mean_density": 1.3560749292373657,
+          "sd": 0.6767619848251343
+        },
+        "VeryMildDemented": {
+          "mean_density": 0.9809151887893677,
+          "sd": 0.3229485750198364
+        },
+        "MildDemented": {
+          "mean_density": 0.8752850294113159,
+          "sd": 0.46811091899871826
+        },
+        "ModerateDemented": {
+          "mean_density": 0.6377036571502686,
+          "sd": 0.1884043961763382
+        }
+      },
+      "anova_F": 63.91227340698242,
+      "anova_p": 1.674948792852946e-38,
+      "eta_squared": 0.13063432276248932
+    }
+  },
+  "energy": {
+    "mean": -3.3241124153137207,
+    "p95": -3.080909013748169,
+    "p99": -2.8359289169311523
+  }
+}

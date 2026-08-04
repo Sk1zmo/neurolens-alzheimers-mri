@@ -1,0 +1,6 @@
+Metric,Value,95% CI low,95% CI high
+Accuracy,0.9984,0.9961,1.0000
+Balanced Accuracy,0.9989,0.9971,1.0000
+Macro F1,0.9991,0.9976,1.0000
+Weighted F1,0.9984,0.9961,1.0000
+Cohen Kappa,0.9974,0.9935,1.0000

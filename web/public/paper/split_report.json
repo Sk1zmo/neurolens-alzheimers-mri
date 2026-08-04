@@ -1,0 +1,62 @@
+{
+  "seed": 1337,
+  "classes": [
+    "NonDemented",
+    "VeryMildDemented",
+    "MildDemented",
+    "ModerateDemented"
+  ],
+  "original_counts": {
+    "NonDemented": 3200,
+    "VeryMildDemented": 2240,
+    "MildDemented": 896,
+    "ModerateDemented": 64
+  },
+  "original_split": {
+    "train": {
+      "NonDemented": 2080,
+      "VeryMildDemented": 1456,
+      "MildDemented": 583,
+      "ModerateDemented": 41
+    },
+    "val": {
+      "NonDemented": 480,
+      "VeryMildDemented": 336,
+      "MildDemented": 134,
+      "ModerateDemented": 10
+    },
+    "test": {
+      "NonDemented": 640,
+      "VeryMildDemented": 448,
+      "MildDemented": 179,
+      "ModerateDemented": 13
+    }
+  },
+  "augmented": {
+    "used": true,
+    "leak_filter": true,
+    "total": 33984,
+    "kept": 22106,
+    "dropped": 11878,
+    "similarity_to_source": {
+      "mean": 0.9481120705604553,
+      "p05": 0.8889783620834351,
+      "p50": 0.9530853033065796,
+      "p95": 0.990814745426178
+    },
+    "note": "Each augmented image was assigned to its single most similar original in frozen ImageNet EfficientNet-B0 embedding space; images whose source fell in val/test were removed from training."
+  },
+  "final": {
+    "train_total": 26266,
+    "train_original": 4160,
+    "train_augmented": 22106,
+    "val_total": 960,
+    "test_total": 1280,
+    "train_per_class": {
+      "NonDemented": 8352,
+      "VeryMildDemented": 7347,
+      "MildDemented": 6481,
+      "ModerateDemented": 4086
+    }
+  }
+}

@@ -1,0 +1,5 @@
+Stage,Precision,Recall,F1,AUC,AP,n
+Non Demented,0.997,1.000,0.998,1.000,1.000,640
+Very Mild Demented,1.000,0.996,0.998,1.000,1.000,448
+Mild Demented,1.000,1.000,1.000,1.000,1.000,179
+Moderate Demented,1.000,1.000,1.000,1.000,1.000,13

@@ -167,6 +167,30 @@ def main() -> None:
     best = {"macro_f1": -1.0, "epoch": -1}
     ckpt_path = C.CHECKPOINT_DIR / args.out
     started = time.time()
+    history_path = C.REPORTS_DIR / (
+        "training_history.json" if args.out == "best.pt"
+        else f"training_history_{Path(args.out).stem}.json")
+
+    def flush_history(done: bool = False) -> None:
+        """Write after every epoch, not just at the end.
+
+        A run killed at epoch 19 of 25 otherwise leaves no curve at all, which
+        is exactly when you most want to see what it was doing.
+        """
+        history_path.write_text(json.dumps({
+            "history": history, "best": best, "complete": done,
+            "elapsed_sec": time.time() - started,
+            "train_size": len(train_ds), "val_size": len(val_ds),
+            "config": {
+                "batch_size": args.batch_size, "workers": args.workers,
+                "epochs_head": args.epochs_head,
+                "epochs_finetune": args.epochs_finetune,
+                "lr_head": C.LR_HEAD, "lr_backbone": C.LR_BACKBONE,
+                "weight_decay": C.WEIGHT_DECAY,
+                "label_smoothing": C.LABEL_SMOOTHING,
+                "img_size": C.IMG_SIZE, "seed": C.SEED,
+            },
+        }, indent=2), encoding="utf-8")
 
     # ---------------- stage 1: frozen backbone ----------------
     if args.epochs_head > 0:
@@ -185,6 +209,7 @@ def main() -> None:
                   f"train loss {tr['loss']:.4f} acc {tr['acc']:.4f} | "
                   f"val loss {va['loss']:.4f} acc {va['acc']:.4f} "
                   f"macroF1 {va['macro_f1']:.4f}")
+            flush_history()
 
     # ---------------- stage 2: full fine-tune ----------------
     print("\n=== Stage 2: full fine-tune ===")
@@ -224,6 +249,7 @@ def main() -> None:
               f"train loss {tr['loss']:.4f} acc {tr['acc']:.4f} | "
               f"val loss {va['loss']:.4f} acc {va['acc']:.4f} "
               f"macroF1 {va['macro_f1']:.4f}{flag}")
+        flush_history()
 
         if stale >= C.EARLY_STOP_PATIENCE:
             print(f"early stop: no val macro-F1 gain in {stale} epochs")
@@ -233,12 +259,8 @@ def main() -> None:
     print(f"\nBest val macro-F1 {best['macro_f1']:.4f} @ epoch {best['epoch']} "
           f"({elapsed/60:.1f} min)")
     print(f"checkpoint -> {ckpt_path}")
-
-    with open(C.REPORTS_DIR / "training_history.json", "w", encoding="utf-8") as f:
-        json.dump({"history": history, "best": best,
-                   "elapsed_sec": elapsed,
-                   "train_size": len(train_ds), "val_size": len(val_ds)},
-                  f, indent=2)
+    flush_history(done=True)
+    print(f"history    -> {history_path}")
 
 
 if __name__ == "__main__":
